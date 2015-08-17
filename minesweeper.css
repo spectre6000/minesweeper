@@ -1,7 +1,7 @@
 #header {
   width: 50%;
   height: 50px;
-  margin: 20px auto;
+  margin: 0 auto;
   position: relative;
   border: 1px solid black;
 }
@@ -28,14 +28,27 @@
     margin: 0 auto;
   }
 
-#setupForm {
+#gameboard {
   display: block;
-  width: 250px;
-  margin: 50px auto 25px auto;
+  margin: 0 auto;
 }
+  
+  .space {
+    height: 19px;
+    width: 19px;
+  }
 
-button {
-  display: block;
-  width: 250px;
-  margin: 0 auto 25px auto;
-}
+  .row {
+    height: 19px;
+  }
+
+  form {
+    width: 250px;
+    margin: 50px auto 25px auto;
+  }
+
+  button {
+    display: block;
+    width: 250px;
+    margin: 0 auto 25px auto;
+  }
