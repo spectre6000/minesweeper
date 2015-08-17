@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='http://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="minesweeper.css">
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <div id="clock">00:00</div>
+        <div><img id="smiley" src="images/smile.gif"></div>
+        <div id="counter">00</div>
+      </div>
+      <div id="gameboard">
+        <form id="setupForm" action="form_action.asp">
+          Width: <input type="text" name="width" value="40"><br>
+          Height: <input type="text" name="height" value="40"><br>
+          Hole count: <input type="text" name="holes" value="20"><br>
+        </form>
+        <button onclick="setup()">Start digging!</button>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="minesweeper.js"></script>
+  </body>
+</html>
