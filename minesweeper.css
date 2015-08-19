@@ -38,6 +38,10 @@
     width: 19px;
   }
 
+    .space:hover {
+      cursor: pointer;
+    }
+
   .row {
     height: 19px;
   }

@@ -5,8 +5,8 @@
   var $clock = $container.find('#clock');
   var $smiley = $container.find('#smiley');
   var $gameboard = $container.find('#gameboard');
-  var $setupForm = $container.find('#setupForm');
-  var $spaces = $gameboard.find('.space');
+  var $setupForm;
+  var $spaces = $gameboard;
 
 //House variables
   //clock sections
@@ -70,7 +70,7 @@
           '</form>' +
           '<button onclick="setup()">Start digging!</button>'
         );
-        $setupForm = $container.find('#setupForm');
+        $setupForm = $gameboard.find('#setupForm');
       }
 
       function cleanBoard() {
@@ -92,6 +92,7 @@
         if ( holeRatio() < 0.2 ){
           makeBoard();
           timer();
+          play();
         } else {
           alert("Woah! You'll fall in!");
           cleanBoard();
@@ -101,9 +102,9 @@
 
         function assignCoreVars (input) {
           var formOutput = input.split(" ");  
-          width = formOutput[0];
-          height = formOutput[1];
-          holes = formOutput[2];
+          width = parseInt(formOutput[0]);
+          height = parseInt(formOutput[1]);
+          holes = parseInt(formOutput[2]);
         }
 
         function holeRatio() {
@@ -112,23 +113,21 @@
 
       function makeBoard() {
         cleanBoard();
-        for (var i = 0; i < height; i++) {
-          var h = i + 1;
-          $gameboard.append('<div id="row' + h + '" class="row" ></div>')
-
-          for (var x = 0; x < width; x++) {
-            var w = x + 1;
-            $('#row'+i).append('<span id="row' + h + 'col' + w + '" class="space" ><img src="images/space.jpg"></span>');
+        for (var i = 1; i < parseInt(height) + 1; i++) {
+          $gameboard.append('<div id="row' + i + '" class="row" ></div>')
+          for (var x = 1; x < parseInt(width) + 1; x++) {
+            $('#row'+i).append('<span id="' + i + '-' + x + '" class="space" ><img src="images/space.jpg"></span>');
             $gameboard.css({"width": width * 19 + "px"});
           }
         }
+        $spaces = $gameboard.find('.space');
         holeSetup();
       }
 
         function holeSetup() {
           for (var i = 0; i < holes; i++) {
-            var col = randomSpace(width);
-            var row = randomSpace(height);
+            var col = randomSpace(height) + 1;
+            var row = randomSpace(width) + 1;
             holeCoordinates.push([col, row]);
             for (var j = 0; j < holeCoordinates.length-1; j++) {
               if ( holeCoordinates[j][0] == col && holeCoordinates[j][1] == row ) {
@@ -143,13 +142,39 @@
             return Math.floor(Math.random() * axis);
           }
 
+  //Game play
+    
+    function play() {
+      $spaces.click( function() {
+        dig( $(this) );
+      });
+    }
 
+      function dig(space) {
+        var clickedCol = space.attr('id').split('-')[0];
+        var clickedRow = space.attr('id').split('-')[1];
+        for (var i = 0; i < holeCoordinates.length; i++ ) {
+          if ( holeCoordinates[i][0] == clickedRow && holeCoordinates[i][1] == clickedCol ) {
+            space.find('img').attr('src', "images/hole.jpg");
+          }
+        }
+      }
+
+      function showHoles() {
+        for (var i = 0; i < holeCoordinates.length; i++ ) {
+          $('#' + holeCoordinates[i][0] + '-' + holeCoordinates[i][1]).find('img').attr('src', "images/hole.jpg");
+        }
+      }
+
+    $smiley.click(function() {
+      stopTimer();
+      // newGame();
+      showHoles();
+    });
 
 //execute
 
   $(function(){
-    $smiley.click(function() {
-      stopTimer();
-      newGame();
-    });
+    newGame();
+
   });
