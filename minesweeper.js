@@ -1,11 +1,12 @@
 //DOM
 
-  $container = $('#container');
-  $counter = $container.find('#counter');
-  $clock = $container.find('#clock');
-  $smiley = $container.find('#smiley');
-  $gameboard = $container.find('#gameboard');
-  $setupForm = $container.find('#setupForm');
+  var $container = $('#container');
+  var $counter = $container.find('#counter');
+  var $clock = $container.find('#clock');
+  var $smiley = $container.find('#smiley');
+  var $gameboard = $container.find('#gameboard');
+  var $setupForm = $container.find('#setupForm');
+  var $spaces = $gameboard.find('.space');
 
 //House variables
   //clock sections
@@ -13,9 +14,10 @@
     var minutes = 0; 
 
   //board setup
-    var width = 20;
-    var height = 20;
-    var holes = 10;
+    var width = 38;
+    var height = 38;
+    var holes = 20;
+    var holeCoordinates = [];
 
 //Movement
 
@@ -56,34 +58,57 @@
 
     function newGame() {
       cleanBoard();
-      $gameboard.append('<form id="setupForm" action="form_action.asp">' + 
-          'Width: <input type="text" name="width" value="38"><br>' +
-          'Height: <input type="text" name="height" value="38"><br>' +
-          'Hole count: <input type="text" name="holes" value="20"><br>' +
-        '</form>' + 
-        '<button onclick="setup()">Start digging!</button>')
+      resetForm();
     }
 
-    function setup() {
-      var formInput = [];
-      for (var i = 0; i < $setupForm[0].length; i++) {
-        formInput += $setupForm[0].elements[i].value + " ";
-      }
-      formProcess(formInput);
-      makeBoard();
-      timer();
-    }
-
-      function formProcess(formInput) {
-        formOutput = formInput.split(" ");
-        width = formOutput[0];
-        height = formOutput[1];
-        holes = formOutput[2];
+      function resetForm() {
+        $gameboard.append(
+          '<form id="setupForm">' +
+            'Width: <input type="text" name="width" value="' + width + '"><br>' +
+            'Height: <input type="text" name="height" value="' + height + '"><br>' +
+            'Hole count: <input type="text" name="holes" value="' + holes + '"><br>' +
+          '</form>' +
+          '<button onclick="setup()">Start digging!</button>'
+        );
+        $setupForm = $container.find('#setupForm');
       }
 
       function cleanBoard() {
         $gameboard.html('');
+        $clock.html('00:00');
       }
+
+    function setup() {
+      //split out the form values to parse into global variables
+      var formInput = [];
+      for (var i = 0; i < $setupForm[0].length; i++) {
+        formInput += $setupForm[0].elements[i].value + " ";
+      }
+      formProcess(formInput)
+    }
+
+      function formProcess(formInput) {
+        assignCoreVars(formInput);
+        if ( holeRatio() < 0.2 ){
+          makeBoard();
+          timer();
+        } else {
+          alert("Woah! You'll fall in!");
+          cleanBoard();
+          resetForm();
+        }
+      }
+
+        function assignCoreVars (input) {
+          var formOutput = input.split(" ");  
+          width = formOutput[0];
+          height = formOutput[1];
+          holes = formOutput[2];
+        }
+
+        function holeRatio() {
+          return holes / (width * height);
+        }
 
       function makeBoard() {
         cleanBoard();
@@ -97,11 +122,34 @@
             $gameboard.css({"width": width * 19 + "px"});
           }
         }
+        holeSetup();
       }
 
-$(function(){
-  $smiley.click(function() {
-    stopTimer();
-    newGame();
+        function holeSetup() {
+          for (var i = 0; i < holes; i++) {
+            var col = randomSpace(width);
+            var row = randomSpace(height);
+            holeCoordinates.push([col, row]);
+            for (var j = 0; j < holeCoordinates.length-1; j++) {
+              if ( holeCoordinates[j][0] == col && holeCoordinates[j][1] == row ) {
+                holeCoordinates.pop();
+                i--;
+              }
+            }
+          }
+        }
+
+          function randomSpace(axis) {
+            return Math.floor(Math.random() * axis);
+          }
+
+
+
+//execute
+
+  $(function(){
+    $smiley.click(function() {
+      stopTimer();
+      newGame();
+    });
   });
-});
