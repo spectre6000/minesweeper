@@ -18,6 +18,7 @@
     var rows = 5;
     var holes = 4;
     var holeCoordinates = [];
+    var gameOn = true;
 
 //Movement
 
@@ -88,6 +89,7 @@
         $gameboard.html('');
         $clock.html('00:00');
         $smiley.attr('src', 'images/smile.gif');
+        gameOn = true;
       }
 
     function setup() {
@@ -186,8 +188,17 @@
   //Game play
     
     function play() {
-      $spaces.click( function() {
-        dig( $(this) );
+      $spaces.mousedown(function(event) {
+        if (gameOn) {
+          switch (event.which) {
+            case 1:
+              dig( $(this) );
+              break;
+            case 3:
+              flag( $(this) );
+              break;
+          }
+        }
       });
     }
 
@@ -195,22 +206,30 @@
         //split out coordinates
         var col = parseInt(space.attr('id').split('-')[0]);
         var row = parseInt(space.attr('id').split('-')[1]);
-        //check for hole
-        if (multidimensionalArrayContains(holeCoordinates, holeCoordinates.length, col, row)) {
-          showHoles();
-          //change top smiley to digging gif
-          $smiley.attr('src', 'images/digging.gif');
-        } else {
+        //make sure it's not already alt marked
+        if ($('#'+col+'-'+row+' img').attr('src')=== 'images/space.jpg') {
+          //check for hole
+          if (multidimensionalArrayContains(holeCoordinates, holeCoordinates.length, col, row)) {
+            showHoles();
+            //change top smiley to digging gif
+            $smiley.attr('src', 'images/digging.gif');
+            gameOn = false;
+          } else {
+            ohMy();
+            //find adjactent holes
+            pokeSand(col, row, []);
+          }
+        }
+      }
+
+        function ohMy(){
           //briefly change top smiley to the OH! face
           $smiley.attr('src', 'images/ohmy.gif');
           //then change it back
           setTimeout( function() {
-              $smiley.attr('src', 'images/smile.gif');
+            $smiley.attr('src', 'images/smile.gif');
           }, 200);
-          //find adjactent holes
-          pokeSand(col, row, []);
         }
-      }
 
         function pokeSand(col, row, completedArray) {
           //define adjacent cells
@@ -265,6 +284,20 @@
           function markHole(col, row, counter) {
             $('#'+col+'-'+row+' img').attr('src', 'images/numbers/' + counter + '.png');
           }
+
+      function flag(space) {
+        //split out coordinates
+        var col = parseInt(space.attr('id').split('-')[0]);
+        var row = parseInt(space.attr('id').split('-')[1]);
+        //mark as hole
+        if ($('#'+col+'-'+row+' img').attr('src')=== 'images/space.jpg') {
+          $('#'+col+'-'+row+' img').attr('src', 'images/mark.jpg');
+        } else if ($('#'+col+'-'+row+' img').attr('src')=== 'images/mark.jpg') {
+          $('#'+col+'-'+row+' img').attr('src', 'images/question.jpg');
+        } else if ($('#'+col+'-'+row+' img').attr('src')=== 'images/question.jpg') {
+          $('#'+col+'-'+row+' img').attr('src', 'images/space.jpg');
+        }
+      }
 
       function showHoles() {
         for (var i = 0; i < holeCoordinates.length; i++ ) {
