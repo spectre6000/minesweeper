@@ -74,10 +74,11 @@
             'Rows: <input type="text" name="rows" value="' + rows + '"><br>' +
             'Hole count: <input type="text" name="holes" value="' + holes + '"><br>' +
           '</form>' +
-          '<button onclick="setup()">Start digging!</button>'
+          '<button onclick="setup()">Start digging!</button>' +
+          '<br>'
         );
         //give form width for centering
-        $gameboard.css({"width": "15%"});
+        $gameboard.css({"width": "20%"});
         //redefine new form element
         $setupForm = $gameboard.find('#setupForm');
       }
@@ -197,64 +198,73 @@
         //check for hole
         if (multidimensionalArrayContains(holeCoordinates, holeCoordinates.length, col, row)) {
           showHoles();
+          //change top smiley to digging gif
           $smiley.attr('src', 'images/digging.gif');
         } else {
-          //find adjactent mines
+          //briefly change top smiley to the OH! face
+          $smiley.attr('src', 'images/ohmy.gif');
+          //then change it back
+          setTimeout( function() {
+              $smiley.attr('src', 'images/smile.gif');
+          }, 200);
+          //find adjactent holes
           pokeSand(col, row, []);
         }
       }
 
-        function pokeSand(col, row, completedArray ) {
-          //convert coordinates to ints for calcs
-          var y = col;
-          var x = row;
-          //pass through for recursion
-          // if (completedArray === undefined) {
-          //   var completed = [];
-          // }
-          var completed = completedArray;
-          
-          completed.push([ y , x ]);
-
-          console.log(completed);
+        function pokeSand(col, row, completedArray) {
           //define adjacent cells
-          var adjacentCells = [];
-          var adjacentCellOptions = [[y+1, x-1], [y+1, x], [y+1, x+1], [y, x-1], [y, x+1], [y-1, x-1], [y-1, x], [y-1, x+1]];
-          //populate adjacentCells array with viable cell options 
-          for (var i = 0; i < adjacentCellOptions.length; i++) {
-            if (adjacentCellOptions[i][0] > 0 && adjacentCellOptions[i][0] <= columns && 
-            adjacentCellOptions[i][1] > 0 && adjacentCellOptions[i][1] <= rows) {
-              adjacentCells.push(adjacentCellOptions[i]);
-            }
-          }
+          var adjacentCells = populateAdjacentCells(col, row);
           //counter for clicked space
-          var counter = 0;
-          // cycle through adjacent cells and add 1 to counter for each adjacent hole
-          for (var i = 0; i < adjacentCells.length; i++) {
-            //check for match
-            if (multidimensionalArrayContains(holeCoordinates, holeCoordinates.length, adjacentCells[i][0], adjacentCells[i][1])) {
-              //advance counter indicating nuber of adjacent holes
-              counter++;
+          var counter = setCounter(adjacentCells);
+          //set up pass through for recursion
+          var completed = completedArray;
+          completed.push([ col , row ]);
+          //counter > 0 + border limits are the recursive base case
+          pokeSandRecursion(counter, adjacentCells, completed);
+          //indicate with numbered png
+          markHole(col, row, counter);
+        }
+
+          function populateAdjacentCells(col, row){
+            adjacentCells = []
+            adjacentCellOptions = [[col+1, row-1], [col+1, row], [col+1, row+1], [col, row-1], [col, row+1], [col-1, row-1], [col-1, row], [col-1, row+1]];
+            //populate adjacentCells array with viable cell options 
+            for (var i = 0; i < adjacentCellOptions.length; i++) {
+              if (adjacentCellOptions[i][0] > 0 && adjacentCellOptions[i][0] <= columns && adjacentCellOptions[i][1] > 0 && adjacentCellOptions[i][1] <= rows) {
+                adjacentCells.push(adjacentCellOptions[i]);
+              }
             }
+            return adjacentCells;
           }
 
-          //counter > 0 + border limits are the recursive base case
-          if (counter > 0) {
-            //push cycled cells to completed array for passing through.
-          } else {
-            //if there aren't any adjacent holes
+          function setCounter(adjacentCells) {
+            var counter = 0
             for (var i = 0; i < adjacentCells.length; i++) {
-              //run through adjacent cells recursively if they haven't already been done.
-              if (!multidimensionalArrayContains(completed, completed.length, adjacentCells[i][0], adjacentCells[i][1])) {
-                
-                pokeSand(adjacentCells[i][0], adjacentCells[i][1], completed);
+              //check for match
+              if (multidimensionalArrayContains(holeCoordinates, holeCoordinates.length, adjacentCells[i][0], adjacentCells[i][1])) {
+                //advance counter indicating nuber of adjacent holes
+                counter++;
+              }
+            }
+            return counter;
+          }
 
+          function pokeSandRecursion(counter, adjacentCells, completed){
+            if (counter === 0) {
+              //if there aren't any adjacent holes
+              for (var i = 0; i < adjacentCells.length; i++) {
+                //run through adjacent cells recursively if they haven't already been done.
+                if (!multidimensionalArrayContains(completed, completed.length, adjacentCells[i][0], adjacentCells[i][1])) {
+                  pokeSand(adjacentCells[i][0], adjacentCells[i][1], completed);
+                }
               }
             }
           }
-          //indicate with numbered png
-          $('#'+col+'-'+row+' img').attr('src', 'images/numbers/' + counter + '.png');
-        }
+
+          function markHole(col, row, counter) {
+            $('#'+col+'-'+row+' img').attr('src', 'images/numbers/' + counter + '.png');
+          }
 
       function showHoles() {
         for (var i = 0; i < holeCoordinates.length; i++ ) {

@@ -1,5 +1,5 @@
 body {
-  background-color: #bbb;
+  background-color: #000;
 }
 
 #header {
@@ -7,7 +7,7 @@ body {
   height: 50px;
   margin: 0 auto;
   position: relative;
-  border: 1px solid black;
+  background-color: #fff;
 }
 
   #counter, #clock {
@@ -35,6 +35,7 @@ body {
 #gameboard {
   display: block;
   margin: 0 auto;
+  background-color: #fff;
 }
   
   .space {
@@ -61,10 +62,13 @@ body {
   form {
     width: 250px;
     margin: 50px auto 25px auto;
+    padding: 15px;
   }
 
   button {
     display: block;
-    width: 250px;
-    margin: 0 auto 25px auto;
+    width: 90%;
+    margin: 5px auto;
+
+
   }
