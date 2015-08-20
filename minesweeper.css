@@ -34,6 +34,8 @@
 }
   
   .space {
+    position: relative;
+    top: -4px;
     height: 19px;
     width: 19px;
   }
@@ -42,7 +44,13 @@
       cursor: pointer;
     }
 
+  .space img {
+    position: relative;
+    top: 4px;
+  }
+
   .row {
+    position: relative;
     height: 19px;
   }
 
