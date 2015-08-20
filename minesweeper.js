@@ -200,14 +200,23 @@
           $smiley.attr('src', 'images/digging.gif');
         } else {
           //find adjactent mines
-          pokeSand(col, row);
+          pokeSand(col, row, []);
         }
       }
 
-        function pokeSand(col, row) {
+        function pokeSand(col, row, completedArray ) {
           //convert coordinates to ints for calcs
           var y = col;
           var x = row;
+          //pass through for recursion
+          // if (completedArray === undefined) {
+          //   var completed = [];
+          // }
+          var completed = completedArray;
+          
+          completed.push([ y , x ]);
+
+          console.log(completed);
           //define adjacent cells
           var adjacentCells = [];
           var adjacentCellOptions = [[y+1, x-1], [y+1, x], [y+1, x+1], [y, x-1], [y, x+1], [y-1, x-1], [y-1, x], [y-1, x+1]];
@@ -228,18 +237,23 @@
               counter++;
             }
           }
-          //if there are any adjacent holes
+
           //counter > 0 + border limits are the recursive base case
           if (counter > 0) {
-            //indicate with numbered png
-            $('#'+col+'-'+row+' img').attr('src', 'images/numbers/' + counter + '.png');
+            //push cycled cells to completed array for passing through.
           } else {
             //if there aren't any adjacent holes
-            for (var i = 0; i < adjacentCells.length; i++) {  
-              //run through adjacent cells recursively
-              pokeSand(i[0], i[1]);
+            for (var i = 0; i < adjacentCells.length; i++) {
+              //run through adjacent cells recursively if they haven't already been done.
+              if (!multidimensionalArrayContains(completed, completed.length, adjacentCells[i][0], adjacentCells[i][1])) {
+                
+                pokeSand(adjacentCells[i][0], adjacentCells[i][1], completed);
+
+              }
             }
           }
+          //indicate with numbered png
+          $('#'+col+'-'+row+' img').attr('src', 'images/numbers/' + counter + '.png');
         }
 
       function showHoles() {
